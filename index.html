@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extrair Texto</title>
+    <title>Extrair e Exibir Texto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,16 +29,28 @@
             border-radius: 5px;
             background-color: #007bff;
             color: white;
+            margin: 10px;
         }
 
         button:hover {
             background-color: #0056b3;
         }
 
+        textarea {
+            width: 100%;
+            max-width: 800px;
+            height: 150px;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
         #result {
             border: 1px solid #ccc;
             padding: 10px;
-            margin: 20px;
             max-height: 400px;
             width: 100%;
             max-width: 800px;
@@ -49,17 +61,18 @@
     </style>
 </head>
 <body>
-    <h1>Texto Principal</h1>
-    <button id="extractButton">Extrair Texto</button>
+    <h1>Extrair e Exibir Texto</h1>
+    <textarea id="inputText" placeholder="Cole o texto copiado aqui..."></textarea>
+    <button id="displayButton">Exibir Texto</button>
     <div id="result"></div>
 
     <script>
-        document.getElementById('extractButton').addEventListener('click', function() {
-            // Extrair texto do corpo da página
-            let text = document.body.innerText;
+        document.getElementById('displayButton').addEventListener('click', function() {
+            // Obter o texto do campo de entrada
+            let inputText = document.getElementById('inputText').value;
 
-            // Exibir o texto extraído no div com id "result"
-            document.getElementById('result').innerText = text;
+            // Exibir o texto no div com id "result"
+            document.getElementById('result').innerText = inputText;
         });
     </script>
 </body>
