@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extrair e Exibir Texto</title>
+    <title>Filtrar e Exibir Texto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,7 +61,7 @@
     </style>
 </head>
 <body>
-    <h1>Extrair e Exibir Texto</h1>
+    <h1>Filtrar e Exibir Texto</h1>
     <textarea id="inputText" placeholder="Cole o texto copiado aqui..."></textarea>
     <button id="displayButton">Exibir Texto</button>
     <div id="result"></div>
@@ -71,8 +71,21 @@
             // Obter o texto do campo de entrada
             let inputText = document.getElementById('inputText').value;
 
-            // Exibir o texto no div com id "result"
-            document.getElementById('result').innerText = inputText;
+            // Criar um elemento temporário para processar o texto
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = inputText;
+
+            // Remover elementos indesejados
+            let elementsToRemove = ['a', 'footer', 'figcaption', 'small']; // Add other unwanted tags if needed
+            elementsToRemove.forEach(tag => {
+                tempDiv.querySelectorAll(tag).forEach(el => el.remove());
+            });
+
+            // Obter o texto filtrado
+            let filteredText = tempDiv.innerText;
+
+            // Exibir o texto filtrado no div com id "result"
+            document.getElementById('result').innerText = filteredText;
         });
     </script>
 </body>
