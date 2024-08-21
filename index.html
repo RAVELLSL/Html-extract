@@ -1,65 +1,58 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extrair Texto de Página Web</title>
+    <title>Converter para PDF</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
+        label {
+            display: block;
+            margin-bottom: 10px;
         }
         input[type="text"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin: 10px 0;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
-        }
-        .result {
-            margin-top: 20px;
-            white-space: pre-wrap; /* Preserve line breaks and whitespace */
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Extrair Texto de Página Web</h1>
-        <input type="text" id="url" placeholder="Cole o link da página aqui">
-        <button onclick="processPage()">Extrair Texto</button>
-        <div class="result" id="result"></div>
-    </div>
+    <h1>Converter Conteúdo da Web para PDF</h1>
+    <label for="url">Insira o link do conteúdo:</label>
+    <input type="text" id="url" placeholder="https://exemplo.com">
+    <button onclick="convertToPDF()">Converter para PDF</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        async function processPage() {
+        async function convertToPDF() {
+            const { jsPDF } = window.jspdf;
             const url = document.getElementById('url').value;
-            const resultDiv = document.getElementById('result');
-            
-            resultDiv.textContent = 'Processando...';
+
+            if (!url) {
+                alert('Por favor, insira um link.');
+                return;
+            }
 
             try {
-                // Obtém o HTML da página
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error('Erro ao acessar a página.');
+                    throw new Error('Erro ao acessar o link.');
                 }
-                const html = await response.text();
+                const text = await response.text();
 
-                // Cria um DOMParser para analisar o HTML
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Extrai o texto do conteúdo principal (ajuste o seletor conforme necessário)
-                const mainContent = doc.querySelector('body').innerText || '';
-                
-                resultDiv.textContent = `Texto extraído:\n${mainContent}`;
+                const pdf = new jsPDF();
+                pdf.text(text, 10, 10);
+                pdf.save('conteudo.pdf');
             } catch (error) {
-                resultDiv.textContent = 'Erro ao processar a página.';
-                console.error('Erro:', error);
+                alert('Erro: ' + error.message);
             }
         }
     </script>
