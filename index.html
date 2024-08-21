@@ -1,118 +1,96 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtrar e Exibir Texto</title>
+    <title>Filtragem de Texto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
+            line-height: 1.6;
+            margin: 20px;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
         }
-
-        h1 {
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
             margin-top: 20px;
         }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            margin: 10px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
         textarea {
             width: 100%;
-            max-width: 800px;
             height: 150px;
-            margin: 20px 0;
+            margin-bottom: 10px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
-            font-size: 16px;
         }
-
-        #result {
-            border: 1px solid #ccc;
-            padding: 10px;
-            max-height: 400px;
-            width: 100%;
-            max-width: 800px;
-            overflow-y: auto;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #007bff;
+            cursor: pointer;
         }
-
-        #copyButton {
+        button.copy {
             background-color: #28a745;
         }
-
-        #copyButton:hover {
-            background-color: #218838;
+        button:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <h1>Filtrar e Exibir Texto</h1>
-    <textarea id="inputText" placeholder="Cole o texto copiado aqui..."></textarea>
-    <button id="displayButton">Exibir Texto</button>
-    <button id="copyButton">Copiar Texto</button>
-    <div id="result"></div>
+    <div class="container">
+        <h1>Filtragem de Texto</h1>
+        <textarea id="input-text" placeholder="Cole o texto completo aqui..."></textarea>
+        <button onclick="filterText()">Carregar Texto</button>
+        <button class="copy" onclick="copyText()">Copiar Texto Filtrado</button>
+        <div class="content" id="filtered-text">
+            <!-- O texto filtrado será exibido aqui -->
+        </div>
+    </div>
 
     <script>
-        // Função para exibir texto filtrado
-        document.getElementById('displayButton').addEventListener('click', function() {
-            let inputText = document.getElementById('inputText').value;
+        function filterText() {
+            const inputText = document.getElementById('input-text').value;
 
-            // Criar um elemento temporário para processar o texto
-            let tempDiv = document.createElement('div');
-            tempDiv.innerHTML = inputText;
+            // Identificadores dos limites do texto principal
+            const startDelimiter = "De acordo com um estudo da revista Scientific Reports,";
+            const endDelimiter = "Então, para evitar tais consequências, o ideal é seguir a quantidade de tempo recomendada para exposição de telas.";
+            
+            // Encontrar os índices dos delimitadores
+            const startIndex = inputText.indexOf(startDelimiter);
+            const endIndex = inputText.indexOf(endDelimiter) + endDelimiter.length;
+            
+            // Extrair o texto principal
+            const filteredText = (startIndex !== -1 && endIndex !== -1)
+                ? inputText.substring(startIndex, endIndex).trim()
+                : "Texto principal não encontrado.";
 
-            // Remover elementos indesejados
-            let elementsToRemove = ['a', 'footer', 'figcaption', 'small', 'aside', 'nav', 'time'];
-            elementsToRemove.forEach(tag => {
-                tempDiv.querySelectorAll(tag).forEach(el => el.remove());
-            });
+            // Inserir o texto filtrado na página
+            document.getElementById('filtered-text').textContent = filteredText;
+        }
 
-            // Obter o texto filtrado
-            let filteredText = tempDiv.innerText;
-
-            // Exibir o texto filtrado no div com id "result"
-            document.getElementById('result').innerText = filteredText;
-        });
-
-        // Função para copiar o texto filtrado para a área de transferência
-        document.getElementById('copyButton').addEventListener('click', function() {
-            let resultText = document.getElementById('result').innerText;
-
-            if (resultText) {
-                navigator.clipboard.writeText(resultText)
-                    .then(() => {
-                        alert('Texto copiado para a área de transferência!');
-                    })
-                    .catch(err => {
-                        alert('Falha ao copiar o texto: ' + err);
-                    });
+        function copyText() {
+            const filteredText = document.getElementById('filtered-text').textContent;
+            if (filteredText) {
+                navigator.clipboard.writeText(filteredText).then(() => {
+                    alert("Texto copiado para a área de transferência!");
+                }).catch(err => {
+                    console.error("Erro ao copiar o texto: ", err);
+                });
             } else {
-                alert('Nenhum texto para copiar!');
+                alert("Nenhum texto para copiar.");
             }
-        });
+        }
     </script>
 </body>
 </html>
