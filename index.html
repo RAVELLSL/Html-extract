@@ -58,17 +58,26 @@
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+
+        #copyButton {
+            background-color: #28a745;
+        }
+
+        #copyButton:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
     <h1>Filtrar e Exibir Texto</h1>
     <textarea id="inputText" placeholder="Cole o texto copiado aqui..."></textarea>
     <button id="displayButton">Exibir Texto</button>
+    <button id="copyButton">Copiar Texto</button>
     <div id="result"></div>
 
     <script>
+        // Função para exibir texto filtrado
         document.getElementById('displayButton').addEventListener('click', function() {
-            // Obter o texto do campo de entrada
             let inputText = document.getElementById('inputText').value;
 
             // Criar um elemento temporário para processar o texto
@@ -76,7 +85,7 @@
             tempDiv.innerHTML = inputText;
 
             // Remover elementos indesejados
-            let elementsToRemove = ['a', 'footer', 'figcaption', 'small']; // Add other unwanted tags if needed
+            let elementsToRemove = ['a', 'footer', 'figcaption', 'small']; // Adicione outras tags se necessário
             elementsToRemove.forEach(tag => {
                 tempDiv.querySelectorAll(tag).forEach(el => el.remove());
             });
@@ -86,6 +95,23 @@
 
             // Exibir o texto filtrado no div com id "result"
             document.getElementById('result').innerText = filteredText;
+        });
+
+        // Função para copiar o texto filtrado para a área de transferência
+        document.getElementById('copyButton').addEventListener('click', function() {
+            let resultText = document.getElementById('result').innerText;
+
+            if (resultText) {
+                navigator.clipboard.writeText(resultText)
+                    .then(() => {
+                        alert('Texto copiado para a área de transferência!');
+                    })
+                    .catch(err => {
+                        alert('Falha ao copiar o texto: ' + err);
+                    });
+            } else {
+                alert('Nenhum texto para copiar!');
+            }
         });
     </script>
 </body>
