@@ -51,28 +51,47 @@
 
                 iframe.onload = async function() {
                     const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                    const iframeWindow = iframe.contentWindow || iframe.contentWindow;
-                    
-                    // Faz uma requisição para obter o conteúdo da página
                     iframe.src = url;
 
                     iframe.onload = async function() {
-                        // Captura a tela do iframe
-                        html2canvas(iframeDocument.body).then(async function(canvas) {
-                            // Converte a captura em imagem
-                            const img = canvas.toDataURL('image/png');
-                            
-                            // Aplica OCR na imagem
-                            const { data: { text } } = await Tesseract.recognize(
-                                img,
-                                'eng',
-                                {
-                                    logger: info => console.log(info)
-                                }
-                            );
+                        const pageHeight = iframeDocument.body.scrollHeight;
+                        const viewportHeight = window.innerHeight; // Altura da janela de visualização
+                        const numParts = Math.ceil(pageHeight / viewportHeight);
+                        let currentPart = 0;
+                        let allText = '';
 
-                            resultDiv.textContent = text;
-                        });
+                        async function captureAndProcessPart() {
+                            // Ajusta a rolagem do iframe para capturar a parte atual
+                            iframe.contentWindow.scrollTo(0, currentPart * viewportHeight);
+
+                            await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar o scroll ser concluído
+
+                            html2canvas(iframeDocument.body).then(async function(canvas) {
+                                const img = canvas.toDataURL('image/png');
+
+                                // Aplica OCR na imagem
+                                const { data: { text } } = await Tesseract.recognize(
+                                    img,
+                                    'eng',
+                                    {
+                                        logger: info => console.log(info)
+                                    }
+                                );
+
+                                allText += text + '\n'; // Adiciona o texto extraído
+
+                                resultDiv.textContent = `Texto extraído até agora:\n${allText}`;
+
+                                currentPart++;
+                                if (currentPart < numParts) {
+                                    captureAndProcessPart(); // Processa a próxima parte
+                                } else {
+                                    resultDiv.textContent = `Texto completo extraído:\n${allText}`;
+                                }
+                            });
+                        }
+
+                        captureAndProcessPart(); // Inicia o processo
                     };
                 };
 
