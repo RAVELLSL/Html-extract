@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Converter para PDF</title>
+    <title>Converter para PDF e Exibir</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,13 +22,27 @@
             padding: 10px 20px;
             font-size: 16px;
         }
+        #pdfContainer {
+            margin-top: 20px;
+            height: 600px;
+            border: 1px solid #ddd;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Converter Conteúdo da Web para PDF</h1>
+    <h1>Converter Conteúdo da Web para PDF e Exibir</h1>
     <label for="url">Insira o link do conteúdo:</label>
     <input type="text" id="url" placeholder="https://exemplo.com">
     <button onclick="convertToPDF()">Converter para PDF</button>
+
+    <div id="pdfContainer">
+        <iframe id="pdfIframe"></iframe>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -50,7 +64,14 @@
 
                 const pdf = new jsPDF();
                 pdf.text(text, 10, 10);
-                pdf.save('conteudo.pdf');
+
+                // Cria um blob com o PDF
+                const pdfBlob = pdf.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                // Atualiza o iframe para exibir o PDF
+                const iframe = document.getElementById('pdfIframe');
+                iframe.src = pdfUrl;
             } catch (error) {
                 alert('Erro: ' + error.message);
             }
