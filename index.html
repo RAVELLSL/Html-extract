@@ -36,25 +36,25 @@
         <div class="result" id="result"></div>
     </div>
     <script>
-        function extractText() {
+        async function extractText() {
             const link = document.getElementById('link').value;
             const resultDiv = document.getElementById('result');
             
             resultDiv.textContent = 'Processando...';
 
-            // Carregar a imagem
-            Tesseract.recognize(
-                link,
-                'eng',
-                {
-                    logger: info => console.log(info)
-                }
-            ).then(({ data: { text } }) => {
+            try {
+                const { data: { text } } = await Tesseract.recognize(
+                    link,
+                    'eng',
+                    {
+                        logger: info => console.log(info)
+                    }
+                );
                 resultDiv.textContent = text;
-            }).catch(error => {
+            } catch (error) {
                 resultDiv.textContent = 'Erro ao processar a imagem.';
                 console.error('Erro:', error);
-            });
+            }
         }
     </script>
 </body>
