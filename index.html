@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR com Tesseract.js</title>
+    <title>OCR de Página Web</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,33 +26,59 @@
             white-space: pre-wrap; /* Preserve line breaks and whitespace */
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.2/dist/tesseract.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Extrair Texto de Imagem</h1>
-        <input type="text" id="link" placeholder="Cole o link da imagem aqui">
-        <button onclick="extractText()">Extrair Texto</button>
+        <h1>Extrair Texto de Página Web</h1>
+        <input type="text" id="url" placeholder="Cole o link da página aqui">
+        <button onclick="processPage()">Extrair Texto</button>
         <div class="result" id="result"></div>
     </div>
     <script>
-        async function extractText() {
-            const link = document.getElementById('link').value;
+        async function processPage() {
+            const url = document.getElementById('url').value;
             const resultDiv = document.getElementById('result');
             
             resultDiv.textContent = 'Processando...';
 
             try {
-                const { data: { text } } = await Tesseract.recognize(
-                    link,
-                    'eng',
-                    {
-                        logger: info => console.log(info)
-                    }
-                );
-                resultDiv.textContent = text;
+                // Cria um iframe para carregar o conteúdo da página
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+
+                iframe.onload = async function() {
+                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                    const iframeWindow = iframe.contentWindow || iframe.contentWindow;
+                    
+                    // Faz uma requisição para obter o conteúdo da página
+                    iframe.src = url;
+
+                    iframe.onload = async function() {
+                        // Captura a tela do iframe
+                        html2canvas(iframeDocument.body).then(async function(canvas) {
+                            // Converte a captura em imagem
+                            const img = canvas.toDataURL('image/png');
+                            
+                            // Aplica OCR na imagem
+                            const { data: { text } } = await Tesseract.recognize(
+                                img,
+                                'eng',
+                                {
+                                    logger: info => console.log(info)
+                                }
+                            );
+
+                            resultDiv.textContent = text;
+                        });
+                    };
+                };
+
+                iframe.src = url;
             } catch (error) {
-                resultDiv.textContent = 'Erro ao processar a imagem.';
+                resultDiv.textContent = 'Erro ao processar a página.';
                 console.error('Erro:', error);
             }
         }
