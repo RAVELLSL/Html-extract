@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR de Página Web</title>
+    <title>Extrair Texto de Página Web</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,8 +26,6 @@
             white-space: pre-wrap; /* Preserve line breaks and whitespace */
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.2/dist/tesseract.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -44,58 +42,21 @@
             resultDiv.textContent = 'Processando...';
 
             try {
-                // Cria um iframe para carregar o conteúdo da página
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
+                // Obtém o HTML da página
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Erro ao acessar a página.');
+                }
+                const html = await response.text();
 
-                iframe.onload = async function() {
-                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                    iframe.src = url;
+                // Cria um DOMParser para analisar o HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
 
-                    iframe.onload = async function() {
-                        const pageHeight = iframeDocument.body.scrollHeight;
-                        const viewportHeight = window.innerHeight; // Altura da janela de visualização
-                        const numParts = Math.ceil(pageHeight / viewportHeight);
-                        let currentPart = 0;
-                        let allText = '';
-
-                        async function captureAndProcessPart() {
-                            // Ajusta a rolagem do iframe para capturar a parte atual
-                            iframe.contentWindow.scrollTo(0, currentPart * viewportHeight);
-
-                            await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar o scroll ser concluído
-
-                            html2canvas(iframeDocument.body).then(async function(canvas) {
-                                const img = canvas.toDataURL('image/png');
-
-                                // Aplica OCR na imagem
-                                const { data: { text } } = await Tesseract.recognize(
-                                    img,
-                                    'eng',
-                                    {
-                                        logger: info => console.log(info)
-                                    }
-                                );
-
-                                allText += text + '\n'; // Adiciona o texto extraído
-
-                                resultDiv.textContent = `Texto extraído até agora:\n${allText}`;
-
-                                currentPart++;
-                                if (currentPart < numParts) {
-                                    captureAndProcessPart(); // Processa a próxima parte
-                                } else {
-                                    resultDiv.textContent = `Texto completo extraído:\n${allText}`;
-                                }
-                            });
-                        }
-
-                        captureAndProcessPart(); // Inicia o processo
-                    };
-                };
-
-                iframe.src = url;
+                // Extrai o texto do conteúdo principal (ajuste o seletor conforme necessário)
+                const mainContent = doc.querySelector('body').innerText || '';
+                
+                resultDiv.textContent = `Texto extraído:\n${mainContent}`;
             } catch (error) {
                 resultDiv.textContent = 'Erro ao processar a página.';
                 console.error('Erro:', error);
