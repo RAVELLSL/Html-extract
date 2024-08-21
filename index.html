@@ -85,7 +85,7 @@
             tempDiv.innerHTML = inputText;
 
             // Remover elementos indesejados
-            let elementsToRemove = ['a', 'footer', 'figcaption', 'small']; // Adicione outras tags se necessário
+            let elementsToRemove = ['a', 'footer', 'figcaption', 'small', 'aside', 'nav', 'time'];
             elementsToRemove.forEach(tag => {
                 tempDiv.querySelectorAll(tag).forEach(el => el.remove());
             });
