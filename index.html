@@ -65,15 +65,24 @@
             // Identificadores dos limites do texto principal
             const startDelimiter = "De acordo com um estudo da revista Scientific Reports,";
             const endDelimiter = "Então, para evitar tais consequências, o ideal é seguir a quantidade de tempo recomendada para exposição de telas.";
-            
+
             // Encontrar os índices dos delimitadores
             const startIndex = inputText.indexOf(startDelimiter);
             const endIndex = inputText.indexOf(endDelimiter) + endDelimiter.length;
-            
-            // Extrair o texto principal
-            const filteredText = (startIndex !== -1 && endIndex !== -1)
-                ? inputText.substring(startIndex, endIndex).trim()
-                : "Texto principal não encontrado.";
+
+            let filteredText = "";
+            if (startIndex !== -1 && endIndex !== -1) {
+                filteredText = inputText.substring(startIndex, endIndex).trim();
+
+                // Remover links e legendas de imagens
+                filteredText = filteredText
+                    .replace(/https?:\/\/\S+/g, '') // Remove URLs
+                    .replace(/Imagem\s+Shutterstock.*?\n/g, '') // Remove legendas de imagens
+                    .replace(/Leia\s+mais.*?\n/g, '') // Remove links de "Leia mais"
+                    .replace(/\n\s*\n+/g, '\n\n'); // Remove quebras de linha extras
+            } else {
+                filteredText = "Texto principal não encontrado.";
+            }
 
             // Inserir o texto filtrado na página
             document.getElementById('filtered-text').textContent = filteredText;
