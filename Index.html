@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR com Tesseract.js</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+        }
+        .result {
+            margin-top: 20px;
+            white-space: pre-wrap; /* Preserve line breaks and whitespace */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.2/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Extrair Texto de Imagem</h1>
+        <input type="text" id="link" placeholder="Cole o link da imagem aqui">
+        <button onclick="extractText()">Extrair Texto</button>
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        function extractText() {
+            const link = document.getElementById('link').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.textContent = 'Processando...';
+
+            // Carregar a imagem
+            Tesseract.recognize(
+                link,
+                'eng',
+                {
+                    logger: info => console.log(info)
+                }
+            ).then(({ data: { text } }) => {
+                resultDiv.textContent = text;
+            }).catch(error => {
+                resultDiv.textContent = 'Erro ao processar a imagem.';
+                console.error('Erro:', error);
+            });
+        }
+    </script>
+</body>
+</html>
